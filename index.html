@@ -1,0 +1,71 @@
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js">
+    import * as tf from "@tensorflow/tfjs"
+</script>
+
+<html>
+
+<body onload="loadModel()">
+
+
+  
+    <h1>Input Year Shift in Mortality</h1>
+    <label for="inputM">Year shift: <div id="demo">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="50" class="slider" id="inputM">
+    </div>
+
+  
+    <!-- <form>
+        <label for="inputM">Year shift:</label>
+        <input type="float" id="inputM" name="inputM">
+        <button type="button" onclick="doSurrogate()">Calculate</button>
+    </form> -->
+
+    <h2>Change in GDP (NPV over next 100 years)</h2>
+    <label for="outputNPV">NPV:</label>
+    <input type="text" id="outputNPV" name="outputNPV" readonly>
+
+
+</body>
+
+</html>
+
+
+<script>
+
+    // Load the model
+    async function loadModel() {
+        return tf.loadLayersModel('/tf_model/model.json');
+
+    }
+
+    // Run the surrogate model
+    async function doSurrogate() {
+        // Get input value
+        const model = await loadModel();
+        const inputM = document.getElementById('inputM').value;
+        const inputTensor = tf.tensor2d([0.04, 40, 10, 10, inputM, 0.0, 0.0], [1, 7]);
+        // Get prediction with new input
+        const prediction = model.predict(inputTensor);
+        // print the prediction
+        // console.log(prediction);
+
+        // Display the prediction in the output box
+        document.getElementById("outputNPV").value = prediction.arraySync()[0][0]; // The arraySync() method returns the value of the tensor as a nested array.
+    }
+
+        var slider = document.getElementById("inputM");
+        var output = document.getElementById("demo");
+        
+
+        // Update the current slider value (each time you drag the slider handle)
+        slider.oninput = function() {
+            doSurrogate()
+            output.innerHTML = slider.value; // Display the default slider value
+            // alert("hello")
+        }
+
+    //
+
+</script>
