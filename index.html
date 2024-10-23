@@ -8,19 +8,36 @@
 <body onload="loadModel()">
 
 
-  
-    <h1>Input Year Shift in Mortality</h1>
-    <label for="inputM">Year shift: <div id="demo">--</div></label>
-    <div class="slidecontainer">
-        <input type="range" min="1" max="100" value="50" class="slider" id="inputM">
-    </div>
 
-  
-    <!-- <form>
-        <label for="inputM">Year shift:</label>
-        <input type="float" id="inputM" name="inputM">
-        <button type="button" onclick="doSurrogate()">Calculate</button>
-    </form> -->
+    <h1>Input Parameter Values</h1>
+    <label for="inputMortality">Mortality rate year shift: <div id="demo1">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min=0 max=10 value=0.0 step=0.1 class="slider" id="inputMortality">
+    </div>
+    <label for="inputFertility">Fertility rate year shift: <div id="demo2">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min=0 max=10 value=0.0 step=0.1 class="slider" id="inputFertility">
+    </div>
+    <label for="inputProductivity">Productivity rate year shift: <div id="demo3">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min=0 max=10 value=0.0 step=0.1 class="slider" id="inputProductivity">
+    </div>
+    <label for="inputR">Interest rate for discounting: <div id="demo4">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min=0.01 max=0.10 value=0.04 step=0.005 class="slider" id="inputR">
+    </div>
+    <label for="inputAge">Age at which effects felt: <div id="demo5">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min=40 max=65 value=40 class="slider" id="inputAge">
+    </div>
+    <label for="inputStartYear">Years until aging treatment enters market: <div id="demo6">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min=0 max=20 value=10 class="slider" id="inputStartYear">
+    </div>
+    <label for="inputNumYears">Years from market entry until max adoption of treatment: <div id="demo7">--</div></label>
+    <div class="slidecontainer">
+        <input type="range" min=0 max=20 value=10 class="slider" id="inputNumYears">
+    </div>
 
     <h2>Change in GDP (NPV over next 100 years)</h2>
     <label for="outputNPV">NPV:</label>
@@ -36,7 +53,7 @@
 
     // Load the model
     async function loadModel() {
-        return tf.loadLayersModel('tf_model/model.json');
+        return tf.loadLayersModel('/tf_model/model.json');
 
     }
 
@@ -44,26 +61,66 @@
     async function doSurrogate() {
         // Get input value
         const model = await loadModel();
-        const inputM = document.getElementById('inputM').value;
-        const inputTensor = tf.tensor2d([0.04, 40, 10, 10, inputM, 0.0, 0.0], [1, 7]);
+        const inputR = parseFloat(document.getElementById('inputR').value);
+        const inputAge = parseFloat(document.getElementById('inputAge').value);
+        const inputStartYear = parseFloat(document.getElementById('inputStartYear').value);
+        const inputNumYears = parseFloat(document.getElementById('inputNumYears').value);
+        const inputMortality = parseFloat(document.getElementById('inputMortality').value);
+        const inputFertility = parseFloat(document.getElementById('inputFertility').value);
+        const inputProductivity = parseFloat(document.getElementById('inputProductivity').value);
+        console.log(inputR, inputAge, inputStartYear, inputNumYears, inputMortality, inputFertility, inputProductivity)
+        const inputTensor = tf.tensor2d([inputR, inputAge, inputStartYear, inputNumYears, inputMortality, inputFertility, inputProductivity], [1, 7]);
         // Get prediction with new input
         const prediction = model.predict(inputTensor);
-        // print the prediction
-        // console.log(prediction);
 
         // Display the prediction in the output box
         document.getElementById("outputNPV").value = prediction.arraySync()[0][0]; // The arraySync() method returns the value of the tensor as a nested array.
     }
 
-        var slider = document.getElementById("inputM");
-        var output = document.getElementById("demo");
-        
+        var slider1 = document.getElementById("inputMortality");
+        var output1 = document.getElementById("demo1");
+        var slider2 = document.getElementById("inputFertility");
+        var output2 = document.getElementById("demo2");
+        var slider3 = document.getElementById("inputProductivity");
+        var output3 = document.getElementById("demo3");
+        var slider4 = document.getElementById("inputR");
+        var output4 = document.getElementById("demo4");
+        var slider5 = document.getElementById("inputAge");
+        var output5 = document.getElementById("demo5");
+        var slider6 = document.getElementById("inputStartYear");
+        var output6 = document.getElementById("demo6");
+        var slider7 = document.getElementById("inputNumYears");
+        var output7 = document.getElementById("demo7");
+
 
         // Update the current slider value (each time you drag the slider handle)
-        slider.oninput = function() {
-            doSurrogate()
-            output.innerHTML = slider.value; // Display the default slider value
-            // alert("hello")
+        slider1.oninput = function() {
+            output1.innerHTML = slider1.value; // Display the default slider value
+            doSurrogate()  // Compute the result from the surrogate model
+        }
+        slider2.oninput = function() {
+            output2.innerHTML = slider2.value; // Display the default slider value
+            doSurrogate()  // Compute the result from the surrogate model
+        }
+        slider3.oninput = function() {
+            output3.innerHTML = slider3.value; // Display the default slider value
+            doSurrogate()  // Compute the result from the surrogate model
+        }
+        slider4.oninput = function() {
+            output4.innerHTML = slider4.value; // Display the default slider value
+            doSurrogate()  // Compute the result from the surrogate model
+        }
+        slider5.oninput = function() {
+            output5.innerHTML = slider5.value; // Display the default slider value
+            doSurrogate()  // Compute the result from the surrogate model
+        }
+        slider6.oninput = function() {
+            output6.innerHTML = slider6.value; // Display the default slider value
+            doSurrogate()  // Compute the result from the surrogate model
+        }
+        slider7.oninput = function() {
+            output7.innerHTML = slider7.value; // Display the default slider value
+            doSurrogate()  // Compute the result from the surrogate model
         }
 
     //
